@@ -12,7 +12,7 @@ public class StudentManager implements FileConnection<Student> {
 	private List<Student> students = new ArrayList<>();
 
 	private StudentManager() {
-
+		getFromFile();
 	}
 
 	public static StudentManager getInstance() {
@@ -21,6 +21,26 @@ public class StudentManager implements FileConnection<Student> {
 		}
 
 		return instance;
+	}
+
+
+	public boolean isExisted(String id) {
+		if (students.isEmpty()) {
+			return false;
+		}
+
+		for (Student student : students) {
+			if (student.getId().equals(id)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public Student find(String id) {
+		return students.isEmpty() ? null
+				: students.stream().filter(student -> student.getId().equals(id)).findFirst().get();
 	}
 
 	@Override
@@ -42,14 +62,14 @@ public class StudentManager implements FileConnection<Student> {
 
 		try {
 			open(isReadMode);
-	
+
 			if (students.size() != 0) {
 				students.clear();
 			}
 			while (scanner.hasNext()) {
 				students.add(create(scanner.nextLine()));
 			}
-	
+
 			close();
 		} catch (IOException e) {
 			System.err.println("ERROR: Failed to connect to file");
@@ -64,5 +84,23 @@ public class StudentManager implements FileConnection<Student> {
 		Student student = new Student(tokens[0], tokens[1]);
 		return student;
 	}
-	
+
+	public void printList() {
+		printList(students);
+	}
+
+	public void printList(List<Student> students) {
+		System.out.println(
+				"+-----------Student List----------+");
+		System.out.format("|%12s|%20s|\n", "ID", "Name");
+		System.out.println(
+				"+---------------------------------+");
+		students.stream().forEach(StudentManager::printFormattedItem);
+		System.out.println(
+				"+---------------------------------+");
+	}
+
+	private static void printFormattedItem(Student student) {
+		System.out.format("|%12s|%20s|\n", student.getId(), student.getName());
+	}
 }

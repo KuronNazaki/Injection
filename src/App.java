@@ -1,13 +1,28 @@
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 public class App {
-	private final static Scanner userScanner = new Scanner(System.in);
+	private Scanner userScanner = null;
+	private InjectionManager injections = null;
+	private StudentManager students = null;
+	private VaccineManager vaccines = null;
 
-	public static void main(String[] args) {
-		view();
+	private App() {
+		userScanner = new Scanner(System.in);
+		injections = InjectionManager.getInstance();
+		students = StudentManager.getInstance();
+		vaccines = VaccineManager.getInstance();
 	}
 
-	private static void view() {
+	public static void main(String[] args) {
+		App app = new App();
+		app.view();
+	}
+
+	private void view() {
 		int choice = 0;
 		Scanner scanner = new Scanner(System.in);
 		String wantToContinue = null;
@@ -33,8 +48,12 @@ public class App {
 
 			switch (choice) {
 				case 1:
+					injections.printList();
+					break;
+				case 2:
 					do {
 						do {
+							this.add();
 							System.out.print("Do you want to add another injection (Y/N)? ");
 							wantToContinue = scanner.nextLine();
 							if (!wantToContinue.matches("[YyNn]")) {
@@ -42,8 +61,6 @@ public class App {
 							}
 						} while (wantToContinue == null);
 					} while (wantToContinue.toUpperCase().equals("Y"));
-					break;
-				case 2:
 					break;
 				case 3:
 					break;
@@ -61,4 +78,103 @@ public class App {
 
 		scanner.close();
 	}
+
+	private void add() {
+		String id = null;
+		String studentId = null;
+		String vaccineId = null;
+		String firstPlace = null, secondPlace = null;
+		Date firstShot = null, secondShot = null;
+
+		String inputString = null;
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		dateFormat.setLenient(false);
+
+		System.out.println("\n-----ADD NEW INJECTION-----");
+
+		do {
+			System.out.print("Enter ID: ");
+			id = userScanner.nextLine();
+		} while (injections.isExisted(id) || Utility.isEmptyString(id));
+
+		System.out.println();
+		students.printList();
+		do {
+			System.out.print("Enter Student ID (according to above table): ");
+			studentId = userScanner.nextLine();
+		} while (!students.isExisted(studentId) || injections.isVaccinated(studentId) || Utility.isEmptyString(studentId));
+
+		System.out.println();
+		vaccines.printList();
+		do {
+			System.out.print("Enter Vaccine ID (according to above table): ");
+			vaccineId = userScanner.nextLine();
+		} while (!vaccines.isExisted(vaccineId) || Utility.isEmptyString(vaccineId));
+
+		System.out.println();
+		do {
+			try {
+				System.out.print("Enter first injection date (dd/mm/yyyy): ");
+				inputString = userScanner.nextLine();
+
+				if (Utility.isEmptyString(inputString)) {
+					System.out.println("First injection is required");
+					continue;
+				}
+				if (!inputString.matches("^\\d{1,2}/\\d{1,2}/\\d{4}$")) {
+					System.err.println("ERROR: Invalid date");
+					continue;
+				}
+
+				firstShot = dateFormat.parse(inputString);
+				if (injections.isFutureDate(firstShot)) {
+					firstShot = null;
+				}
+			} catch (ParseException e) {
+				System.err.println("ERROR: Invalid date");
+			}
+		} while (firstShot == null);
+
+		System.out.println();
+		do {
+			System.out.print("Enter first injection place: ");
+			firstPlace = userScanner.nextLine();
+		} while (Utility.isEmptyString(firstPlace));
+
+		System.out.println();
+		do {
+			try {
+				System.out.print("Enter second injection date (dd/mm/yyyy) - This field can be ignored: ");
+				inputString = userScanner.nextLine();
+
+				if (inputString.equals("")) {
+					break;
+				}
+				if (!inputString.matches("^\\d{1,2}/\\d{1,2}/\\d{4}$")) {
+					System.err.println("ERROR: Invalid date");
+					continue;
+				}
+
+				secondShot = dateFormat.parse(inputString);
+				if (!injections.isValidSecondDate(firstShot, secondShot)) {
+					secondShot = null;
+				}
+			} catch (ParseException e) {
+				System.err.println("ERROR: Invalid date");
+			}
+		} while (secondShot == null);
+
+		System.out.println();
+		System.out.print("Enter second injection place - This field can be ignored: ");
+		secondPlace = userScanner.nextLine();
+		if (secondPlace.equals("")) {
+			secondPlace = null;
+		}
+
+		Injection injection = new Injection(id, firstPlace, secondPlace, firstShot, secondShot, studentId, vaccineId);
+		injections.add(injection);
+		System.out.println("New injection with ID = " + id + " has been added successfully");
+	}
+
+
 }

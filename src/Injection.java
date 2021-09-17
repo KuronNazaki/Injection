@@ -11,9 +11,10 @@ public class Injection {
 
 	public Injection() {
 
-	} 
+	}
 
-	public Injection(String id, String firstInjectionPlace, String secondInjectionPlace, Date firstInjectionDate, Date secondInjectionDate, String studentId, String vaccineId) {
+	public Injection(String id, String firstInjectionPlace, String secondInjectionPlace, Date firstInjectionDate,
+			Date secondInjectionDate, String studentId, String vaccineId) {
 		this.id = id;
 		this.firstInjectionPlace = firstInjectionPlace;
 		this.secondInjectionPlace = secondInjectionPlace;
@@ -73,14 +74,19 @@ public class Injection {
 
 	public void setVaccineId(String vaccineId) {
 		this.vaccineId = vaccineId;
-	} 
+	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[id=" + id + ", firstInjectionPlace=" + firstInjectionPlace + ", secondInjectionPlace=" + secondInjectionPlace + ", firstInjectionDate=" + firstInjectionDate + ", secondInjectionDate=" + secondInjectionDate + ", studentId=" + studentId + ", vaccineId=" + vaccineId + "]";
+		return getClass().getSimpleName() + "[id=" + id + ", firstInjectionPlace=" + firstInjectionPlace
+				+ ", secondInjectionPlace=" + secondInjectionPlace + ", firstInjectionDate=" + firstInjectionDate
+				+ ", secondInjectionDate=" + secondInjectionDate + ", studentId=" + studentId + ", vaccineId=" + vaccineId
+				+ "]";
 	}
 
 	public String toWritableString() {
-		return id + "|" + firstInjectionPlace + "|" + secondInjectionPlace + "|" + Utility.toSimpleDateString(firstInjectionDate) + "|" + Utility.toSimpleDateString(secondInjectionDate) + "|" + studentId + "|" + vaccineId;
+		return id + "|" + firstInjectionPlace + "|" + secondInjectionPlace + "|"
+				+ Utility.toSimpleDateString(firstInjectionDate) + "|" + Utility.toSimpleDateString(secondInjectionDate) + "|"
+				+ studentId + "|" + vaccineId;
 	}
 }

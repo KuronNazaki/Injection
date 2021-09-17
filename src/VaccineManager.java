@@ -12,7 +12,7 @@ public class VaccineManager implements FileConnection<Vaccine> {
 	private List<Vaccine> vaccines = new ArrayList<>();
 
 	private VaccineManager() {
-
+		getFromFile();
 	}
 
 	public static VaccineManager getInstance() {
@@ -22,7 +22,26 @@ public class VaccineManager implements FileConnection<Vaccine> {
 
 		return instance;
 	}
-	
+
+	public boolean isExisted(String id) {
+		if (vaccines.isEmpty()) {
+			return false;
+		}
+
+		for (Vaccine vaccine : vaccines) {
+			if (vaccine.getId().equals(id)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public Vaccine find(String id) {
+		return vaccines.isEmpty() ? null
+				: vaccines.stream().filter(vaccine -> vaccine.getId().equals(id)).findFirst().get();
+	}
+
 	@Override
 	public void open(boolean isReadMode) throws IOException {
 		if (isReadMode) {
@@ -42,14 +61,14 @@ public class VaccineManager implements FileConnection<Vaccine> {
 
 		try {
 			open(isReadMode);
-	
+
 			if (vaccines.size() != 0) {
 				vaccines.clear();
 			}
 			while (scanner.hasNext()) {
 				vaccines.add(create(scanner.nextLine()));
 			}
-	
+
 			close();
 		} catch (IOException e) {
 			System.err.println("ERROR: Failed to connect to file");
@@ -62,5 +81,21 @@ public class VaccineManager implements FileConnection<Vaccine> {
 		String[] tokens = data.split(";");
 		Vaccine vaccine = new Vaccine(tokens[0], tokens[1]);
 		return vaccine;
+	}
+
+	public void printList() {
+		printList(vaccines);
+	}
+
+	public void printList(List<Vaccine> vaccines) {
+		System.out.println("+----Vaccine List-----+");
+		System.out.format("|%5s|%15s|\n", "ID", "Name");
+		System.out.println("+---------------------+");
+		vaccines.stream().forEach(VaccineManager::printFormattedItem);
+		System.out.println("+---------------------+");
+	}
+
+	private static void printFormattedItem(Vaccine vaccine) {
+		System.out.format("|%5s|%15s|\n", vaccine.getId(), vaccine.getName());
 	}
 }
