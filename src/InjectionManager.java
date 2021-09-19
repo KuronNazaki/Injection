@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -55,7 +56,7 @@ public class InjectionManager implements FileConnection<Injection> {
 		return injections.indexOf(injection);
 	}
 
-	public Injection find(String id) {
+	public Injection find(String id) throws NoSuchElementException {
 		return injections.isEmpty() ? null
 				: injections.stream().filter(injection -> injection.getId().equals(id)).findFirst().get();
 	}

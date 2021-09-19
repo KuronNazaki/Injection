@@ -2,6 +2,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class App {
@@ -39,7 +40,7 @@ public class App {
 			System.out.print("Your choice: ");
 
 			try {
-				choice = Integer.parseInt(scanner.nextLine());
+				choice = Integer.parseInt(userScanner.nextLine());
 			} catch (NumberFormatException e) {
 				System.err.println("ERROR: Invalid number format");
 				continue;
@@ -52,21 +53,24 @@ public class App {
 					break;
 				case 2:
 					do {
+						this.add();
 						do {
-							this.add();
 							System.out.print("Do you want to add another injection (Y/N)? ");
-							wantToContinue = scanner.nextLine();
-							if (!wantToContinue.matches("[YyNn]")) {
+							wantToContinue = userScanner.nextLine();
+							if (!wantToContinue.matches("[YyNn]") || Utility.isEmptyString(wantToContinue)) {
 								wantToContinue = null;
 							}
 						} while (wantToContinue == null);
 					} while (wantToContinue.toUpperCase().equals("Y"));
 					break;
 				case 3:
+					this.update();
 					break;
 				case 4:
+					this.remove();
 					break;
 				case 5:
+					this.search();
 					break;
 				case 6:
 					System.out.println("Bye. Thank you for using me UwU");
@@ -76,6 +80,7 @@ public class App {
 			}
 		} while (choice != 6);
 
+		injections.saveToFile();
 		scanner.close();
 	}
 
@@ -90,7 +95,7 @@ public class App {
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		dateFormat.setLenient(false);
 
-		System.out.println("\n-----ADD NEW INJECTION-----");
+		System.out.println("\n------ADD NEW INJECTION------");
 
 		do {
 			System.out.print("Enter ID: ");
@@ -176,5 +181,99 @@ public class App {
 		System.out.println("New injection with ID = " + id + " has been added successfully");
 	}
 
+	private void update() {
+		String id = null;
 
+		System.out.println("------UPDATING INJECTION------");
+		do {
+			System.out.print("Enter the injection ID: ");
+			id = userScanner.nextLine();
+		} while (Utility.isEmptyString(id));
+
+		System.out.println();
+		Injection injection = injections.find(id);
+		if (injection == null) {
+			System.out.println("WARNING: Injection does not exist");
+		} else if (injection.getSecondInjectionDate() != null && injection.getSecondInjectionPlace() != null) {
+			System.out.println("This student has got 2 injections");
+		} else {
+			String inputString = null;
+			String secondPlace = null;
+			Date secondShot = null;
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+			System.out.println();
+			do {
+				try {
+					System.out.print("Enter second injection date (dd/mm/yyyy): ");
+					inputString = userScanner.nextLine();
+
+					if (Utility.isEmptyString(inputString)) {
+						continue;
+					}
+					if (!inputString.matches("^\\d{1,2}/\\d{1,2}/\\d{4}$")) {
+						System.err.println("ERROR: Invalid date");
+						continue;
+					}
+
+					secondShot = dateFormat.parse(inputString);
+					if (!injections.isValidSecondDate(injection.getFirstInjectionDate(), secondShot)) {
+						secondShot = null;
+					}
+				} catch (ParseException e) {
+					System.err.println("ERROR: Invalid date");
+				}
+			} while (secondShot == null);
+
+			System.out.println();
+			do {
+				System.out.print("Enter second injection place: ");
+				secondPlace = userScanner.nextLine();
+			} while (Utility.isEmptyString(secondPlace));
+
+			int index = injections.indexOf(injection);
+			injection.setSecondInjectionDate(secondShot);
+			injection.setSecondInjectionPlace(secondPlace);
+
+			injections.update(index, injection);
+			System.out.println(injection);
+			System.out.println("Injection with ID = " + injection.getId() + " has been updated successfully");
+		}
+	}
+
+	private void remove() {
+		String id = null;
+		String wantToContinue = null;
+
+		System.out.println("------REMOVE INJECTION------");
+		do {
+			System.out.print("Enter injection ID: ");
+			id = userScanner.nextLine();
+		} while (Utility.isEmptyString(id));
+
+		try {
+			Injection injection = injections.find(id);
+			do {
+				System.out.print("Do you want to remove this injection (Y/N)? ");
+				wantToContinue = userScanner.nextLine();
+				if (!wantToContinue.matches("[YyNn]") || Utility.isEmptyString(wantToContinue)) {
+					wantToContinue = null;
+				}
+			} while (wantToContinue == null);
+
+			if (wantToContinue.toUpperCase().equals("Y")) {
+				injections.remove(injection);
+			} else {
+				System.out.println("Oke oke. I don't remove that UwU");
+			}
+		} catch (NoSuchElementException e) {
+			System.out.println("WARNING: Unavailable injection");
+			return;
+		}
+
+	}
+
+	private void search() {
+
+	}
 }
