@@ -26,7 +26,7 @@ public class InjectionManager implements FileConnection<Injection> {
 	private List<Injection> injections = new ArrayList<>();
 
 	private InjectionManager() {
-
+		getFromFile();
 	}
 
 	public static InjectionManager getInstance() {
@@ -59,6 +59,11 @@ public class InjectionManager implements FileConnection<Injection> {
 	public Injection find(String id) throws NoSuchElementException {
 		return injections.isEmpty() ? null
 				: injections.stream().filter(injection -> injection.getId().equals(id)).findFirst().get();
+	}
+
+	public Injection findByStudentId(String studentId) throws NoSuchElementException {
+		return injections.isEmpty() ? null
+				: injections.stream().filter(injection -> injection.getStudentId().equals(studentId)).findFirst().get();
 	}
 
 	public List<Injection> findAll(String studentId) {
@@ -125,7 +130,9 @@ public class InjectionManager implements FileConnection<Injection> {
 	public void close() throws IOException {
 		if (scanner != null) {
 			scanner.close();
-		} else if (printWriter != null && bufferedWriter != null && fileWriter != null) {
+		}
+		
+		if (printWriter != null && bufferedWriter != null && fileWriter != null) {
 			printWriter.close();
 			bufferedWriter.close();
 			fileWriter.close();
@@ -171,9 +178,10 @@ public class InjectionManager implements FileConnection<Injection> {
 		String[] tokens = data.split("\\|");
 		Injection injection = null;
 
+
 		try {
-			injection = new Injection(tokens[0], tokens[1], tokens[2], dateFormat.parse(tokens[3]),
-					dateFormat.parse(tokens[4]), tokens[5], tokens[6]);
+			injection = new Injection(tokens[0], tokens[1], tokens[2].equals("null") ? null : tokens[2], dateFormat.parse(tokens[3]),
+					tokens[4].equals("null") ? null : dateFormat.parse(tokens[4]), tokens[5], tokens[6]);
 		} catch (ParseException e) {
 			System.err.println("ERROR: Failed to parse object");
 		}
@@ -193,6 +201,18 @@ public class InjectionManager implements FileConnection<Injection> {
 		System.out.println(
 				"+-------------------------------------------------------------------------------------------------------------+");
 		injections.stream().forEach(InjectionManager::printFormattedItem);
+		System.out.println(
+				"+-------------------------------------------------------------------------------------------------------------+");
+	}
+
+	public void printList(Injection injection) {
+		System.out.println(
+				"+---------------------------------------------Injection List--------------------------------------------------+");
+		System.out.format("|%8s|%15s|%15s|%15s|%15s|%15s|%20s|\n", "ID", "First Date", "First Place", "Second Date",
+				"Second Place", "Student ID", "Student Name");
+		System.out.println(
+				"+-------------------------------------------------------------------------------------------------------------+");
+		printFormattedItem(injection);
 		System.out.println(
 				"+-------------------------------------------------------------------------------------------------------------+");
 	}

@@ -1,7 +1,9 @@
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -191,7 +193,13 @@ public class App {
 		} while (Utility.isEmptyString(id));
 
 		System.out.println();
-		Injection injection = injections.find(id);
+		Injection injection = null;
+		try {
+			injection = injections.find(id);
+		} catch (NoSuchElementException e) {
+			System.out.println("WARNING: Unavailable injection");
+			return;
+		}
 		if (injection == null) {
 			System.out.println("WARNING: Injection does not exist");
 		} else if (injection.getSecondInjectionDate() != null && injection.getSecondInjectionPlace() != null) {
@@ -236,7 +244,7 @@ public class App {
 			injection.setSecondInjectionPlace(secondPlace);
 
 			injections.update(index, injection);
-			System.out.println(injection);
+			injections.printList(injection);
 			System.out.println("Injection with ID = " + injection.getId() + " has been updated successfully");
 		}
 	}
@@ -263,6 +271,7 @@ public class App {
 
 			if (wantToContinue.toUpperCase().equals("Y")) {
 				injections.remove(injection);
+				System.out.println("Injection has been successfully removed");
 			} else {
 				System.out.println("Oke oke. I don't remove that UwU");
 			}
@@ -274,6 +283,22 @@ public class App {
 	}
 
 	private void search() {
+		String studentId = null;
 
+		System.out.println("------SEARCH INJECTION BY STUDENT ID------");
+		do {
+			System.out.print("Enter student ID: ");
+			studentId = userScanner.nextLine();
+		} while (Utility.isEmptyString(studentId));
+
+		try {
+			Injection injection = injections.findByStudentId(studentId);
+			List<Injection> searchList = new ArrayList<>();
+			searchList.add(injection);
+			injections.printList(searchList);
+		} catch (NoSuchElementException e) {
+			System.out.println("WARNING: Unavailable injection with such Student ID");
+			return;
+		}
 	}
 }

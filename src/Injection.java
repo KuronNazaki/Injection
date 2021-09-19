@@ -85,8 +85,9 @@ public class Injection {
 	}
 
 	public String toWritableString() {
-		return id + "|" + firstInjectionPlace + "|" + secondInjectionPlace + "|"
-				+ Utility.toSimpleDateString(firstInjectionDate) + "|" + Utility.toSimpleDateString(secondInjectionDate) + "|"
-				+ studentId + "|" + vaccineId;
+		return id + "|" + firstInjectionPlace + "|" + (secondInjectionPlace == null ? "null"
+				: secondInjectionPlace) + "|" + Utility.toSimpleDateString(firstInjectionDate) + "|"
+						+ (secondInjectionDate == null ? "null"
+								: Utility.toSimpleDateString(secondInjectionDate)) + "|" + studentId + "|" + vaccineId;
 	}
 }
