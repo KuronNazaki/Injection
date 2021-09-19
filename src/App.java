@@ -10,8 +10,8 @@ import java.util.Scanner;
 public class App {
 	private Scanner userScanner = null;
 	private InjectionManager injections = null;
-	private StudentManager students = null;
-	private VaccineManager vaccines = null;
+	private Printable<Student> students = null;
+	private Printable<Vaccine> vaccines = null;
 
 	private App() {
 		userScanner = new Scanner(System.in);
@@ -51,7 +51,7 @@ public class App {
 
 			switch (choice) {
 				case 1:
-					injections.printList();
+					injections.print();
 					break;
 				case 2:
 					do {
@@ -105,18 +105,18 @@ public class App {
 		} while (injections.isExisted(id) || Utility.isEmptyString(id));
 
 		System.out.println();
-		students.printList();
+		students.print();
 		do {
 			System.out.print("Enter Student ID (according to above table): ");
 			studentId = userScanner.nextLine();
-		} while (!students.isExisted(studentId) || injections.isVaccinated(studentId) || Utility.isEmptyString(studentId));
+		} while (!(((StudentManager) students).isExisted(studentId)) || injections.isVaccinated(studentId) || Utility.isEmptyString(studentId));
 
 		System.out.println();
-		vaccines.printList();
+		vaccines.print();
 		do {
 			System.out.print("Enter Vaccine ID (according to above table): ");
 			vaccineId = userScanner.nextLine();
-		} while (!vaccines.isExisted(vaccineId) || Utility.isEmptyString(vaccineId));
+		} while (!(((VaccineManager) vaccines).isExisted(vaccineId)) || Utility.isEmptyString(vaccineId));
 
 		System.out.println();
 		do {
@@ -247,7 +247,7 @@ public class App {
 			injection.setSecondInjectionPlace(secondPlace);
 
 			injections.update(index, injection);
-			injections.printList(injection);
+			injections.print(injection);
 			System.out.println("Injection with ID = " + injection.getId() + " has been updated successfully");
 		}
 	}
@@ -298,7 +298,7 @@ public class App {
 			Injection injection = injections.findByStudentId(studentId);
 			List<Injection> searchList = new ArrayList<>();
 			searchList.add(injection);
-			injections.printList(searchList);
+			injections.print(searchList);
 		} catch (NoSuchElementException e) {
 			System.out.println("WARNING: Unavailable injection with such Student ID");
 			return;

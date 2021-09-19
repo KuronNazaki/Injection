@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-public class InjectionManager implements FileConnection<Injection> {
+public class InjectionManager implements FileConnection<Injection>, Printable<Injection> {
 	private static final String FILE_NAME = "injection.txt";
 	private static final long MIN_DIFFERENCE_WEEKS = 4;
 	private static final long MAX_DIFFERENCE_WEEKS = 12;
@@ -189,11 +189,11 @@ public class InjectionManager implements FileConnection<Injection> {
 		return injection;
 	}
 
-	public void printList() {
-		printList(injections);
+	public void print() {
+		print(injections);
 	}
 
-	public void printList(List<Injection> injections) {
+	public void print(List<Injection> injections) {
 		System.out.println(
 				"+---------------------------------------------Injection List--------------------------------------------------+");
 		System.out.format("|%8s|%15s|%15s|%15s|%15s|%15s|%20s|\n", "ID", "First Date", "First Place", "Second Date",
@@ -205,7 +205,7 @@ public class InjectionManager implements FileConnection<Injection> {
 				"+-------------------------------------------------------------------------------------------------------------+");
 	}
 
-	public void printList(Injection injection) {
+	public void print(Injection injection) {
 		System.out.println(
 				"+---------------------------------------------Injection List--------------------------------------------------+");
 		System.out.format("|%8s|%15s|%15s|%15s|%15s|%15s|%20s|\n", "ID", "First Date", "First Place", "Second Date",

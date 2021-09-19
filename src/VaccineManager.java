@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class VaccineManager implements FileConnection<Vaccine> {
+public class VaccineManager implements FileConnection<Vaccine>, Printable<Vaccine> {
 	private static final String FILE_NAME = "vaccine.txt";
 	private static VaccineManager instance = null;
 
@@ -83,11 +83,11 @@ public class VaccineManager implements FileConnection<Vaccine> {
 		return vaccine;
 	}
 
-	public void printList() {
-		printList(vaccines);
+	public void print() {
+		print(this.vaccines);
 	}
 
-	public void printList(List<Vaccine> vaccines) {
+	public void print(List<Vaccine> vaccines) {
 		System.out.println("+----Vaccine List-----+");
 		System.out.format("|%5s|%15s|\n", "ID", "Name");
 		System.out.println("+---------------------+");

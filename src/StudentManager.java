@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class StudentManager implements FileConnection<Student> {
+public class StudentManager implements FileConnection<Student>, Printable<Student> {
 	private static final String FILE_NAME = "student.txt";
 	private static StudentManager instance = null;
 
@@ -85,11 +85,11 @@ public class StudentManager implements FileConnection<Student> {
 		return student;
 	}
 
-	public void printList() {
-		printList(students);
+	public void print() {
+		print(students);
 	}
 
-	public void printList(List<Student> students) {
+	public void print(List<Student> students) {
 		System.out.println(
 				"+-----------Student List----------+");
 		System.out.format("|%12s|%20s|\n", "ID", "Name");
