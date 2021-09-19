@@ -213,9 +213,12 @@ public class App {
 			System.out.println();
 			do {
 				try {
-					System.out.print("Enter second injection date (dd/mm/yyyy): ");
+					System.out.print("Enter second injection date (dd/mm/yyyy - 00/00/0000 to quit updating): ");
 					inputString = userScanner.nextLine();
 
+					if (inputString.equals("00/00/0000")) {
+						return;
+					}
 					if (Utility.isEmptyString(inputString)) {
 						continue;
 					}
