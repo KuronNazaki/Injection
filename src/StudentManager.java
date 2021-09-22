@@ -23,14 +23,13 @@ public class StudentManager implements FileConnection<Student>, Printable<Studen
 		return instance;
 	}
 
-
 	public boolean isExisted(String id) {
 		if (students.isEmpty()) {
 			return false;
 		}
 
 		for (Student student : students) {
-			if (student.getId().equals(id)) {
+			if (student.getId().equals(id.trim())) {
 				return true;
 			}
 		}
@@ -39,8 +38,9 @@ public class StudentManager implements FileConnection<Student>, Printable<Studen
 	}
 
 	public Student find(String id) {
+		String trimId = id.trim();
 		return students.isEmpty() ? null
-				: students.stream().filter(student -> student.getId().equals(id)).findFirst().get();
+				: students.stream().filter(student -> student.getId().equals(trimId)).findFirst().get();
 	}
 
 	@Override
@@ -90,14 +90,11 @@ public class StudentManager implements FileConnection<Student>, Printable<Studen
 	}
 
 	public void print(List<Student> students) {
-		System.out.println(
-				"+-----------Student List----------+");
+		System.out.println("+-----------Student List----------+");
 		System.out.format("|%12s|%20s|\n", "ID", "Name");
-		System.out.println(
-				"+---------------------------------+");
+		System.out.println("+---------------------------------+");
 		students.stream().forEach(StudentManager::printFormattedItem);
-		System.out.println(
-				"+---------------------------------+");
+		System.out.println("+---------------------------------+");
 	}
 
 	private static void printFormattedItem(Student student) {

@@ -31,7 +31,7 @@ public class App {
 		String wantToContinue = null;
 
 		do {
-			System.out.println("\n\nWelcome to Injection Management - @2021 by Huynh Hoang Huy SE160046");
+			System.out.println("\n\nWelcome to Injection Management - @2021 by <Huynh Hoang Huy - SE160046>");
 			System.out.println("Select the options below: ");
 			System.out.println("1. Print the injection list");
 			System.out.println("2. Add a new injection");
@@ -109,7 +109,8 @@ public class App {
 		do {
 			System.out.print("Enter Student ID (according to above table): ");
 			studentId = userScanner.nextLine();
-		} while (!(((StudentManager) students).isExisted(studentId)) || injections.isVaccinated(studentId) || Utility.isEmptyString(studentId));
+		} while (!(((StudentManager) students).isExisted(studentId)) || injections.isVaccinated(studentId)
+				|| Utility.isEmptyString(studentId));
 
 		System.out.println();
 		vaccines.print();
@@ -151,10 +152,10 @@ public class App {
 		System.out.println();
 		do {
 			try {
-				System.out.print("Enter second injection date (dd/mm/yyyy) - This field can be ignored: ");
+				System.out.print("Enter second injection date (dd/mm/yyyy) (This field can be ignored): ");
 				inputString = userScanner.nextLine();
 
-				if (inputString.equals("")) {
+				if (inputString.trim().equals("")) {
 					break;
 				}
 				if (!inputString.matches("^\\d{1,2}/\\d{1,2}/\\d{4}$")) {
@@ -172,15 +173,23 @@ public class App {
 		} while (secondShot == null);
 
 		System.out.println();
-		System.out.print("Enter second injection place - This field can be ignored: ");
-		secondPlace = userScanner.nextLine();
-		if (secondPlace.equals("")) {
-			secondPlace = null;
+		if (secondShot == null) {
+			System.out.println("Nah. You don't need to input place if you don't have date");
+		} else {
+			do {
+				System.out.print("Enter second injection place: ");
+				secondPlace = userScanner.nextLine();
+				if (Utility.isEmptyString(secondPlace)) {
+					secondPlace = null;
+				}
+			} while (secondPlace == null);
+
 		}
 
-		Injection injection = new Injection(id, firstPlace, secondPlace, firstShot, secondShot, studentId, vaccineId);
+		Injection injection = new Injection(id.trim(), firstPlace.trim(), secondPlace.trim(), firstShot, secondShot,
+				studentId.trim(), vaccineId.trim());
 		injections.add(injection);
-		System.out.println("New injection with ID = " + id + " has been added successfully");
+		System.out.println("\nNew injection with ID = " + id + " has been added successfully");
 	}
 
 	private void update() {
@@ -211,6 +220,7 @@ public class App {
 			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 			System.out.println();
+			injections.print(injection);
 			do {
 				try {
 					System.out.print("Enter second injection date (dd/mm/yyyy - 00/00/0000 to quit updating): ");
@@ -248,7 +258,7 @@ public class App {
 
 			injections.update(index, injection);
 			injections.print(injection);
-			System.out.println("Injection with ID = " + injection.getId() + " has been updated successfully");
+			System.out.println("\nInjection with ID = " + injection.getId() + " has been updated successfully");
 		}
 	}
 
@@ -274,7 +284,7 @@ public class App {
 
 			if (wantToContinue.toUpperCase().equals("Y")) {
 				injections.remove(injection);
-				System.out.println("Injection has been successfully removed");
+				System.out.println("\nInjection has been successfully removed");
 			} else {
 				System.out.println("Oke oke. I don't remove that UwU");
 			}
@@ -282,7 +292,6 @@ public class App {
 			System.out.println("WARNING: Unavailable injection");
 			return;
 		}
-
 	}
 
 	private void search() {
@@ -295,7 +304,7 @@ public class App {
 		} while (Utility.isEmptyString(studentId));
 
 		try {
-			Injection injection = injections.findByStudentId(studentId);
+			Injection injection = injections.findByStudentId(studentId.trim());
 			List<Injection> searchList = new ArrayList<>();
 			searchList.add(injection);
 			injections.print(searchList);

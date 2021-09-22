@@ -10,7 +10,7 @@ public class Utility {
 	}
 
 	public static boolean isEmptyString(String data) {
-		if (data.equals("")) {
+		if (data.trim().equals("")) {
 			System.err.println("ERROR: String can't be empty");
 			return true;
 		} else {

@@ -29,7 +29,7 @@ public class VaccineManager implements FileConnection<Vaccine>, Printable<Vaccin
 		}
 
 		for (Vaccine vaccine : vaccines) {
-			if (vaccine.getId().equals(id)) {
+			if (vaccine.getId().equals(id.trim())) {
 				return true;
 			}
 		}
@@ -38,8 +38,9 @@ public class VaccineManager implements FileConnection<Vaccine>, Printable<Vaccin
 	}
 
 	public Vaccine find(String id) {
+		String trimId = id.trim();
 		return vaccines.isEmpty() ? null
-				: vaccines.stream().filter(vaccine -> vaccine.getId().equals(id)).findFirst().get();
+				: vaccines.stream().filter(vaccine -> vaccine.getId().equals(trimId)).findFirst().get();
 	}
 
 	@Override

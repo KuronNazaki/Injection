@@ -43,7 +43,7 @@ public class InjectionManager implements FileConnection<Injection>, Printable<In
 		}
 
 		for (Injection injection : injections) {
-			if (injection.getId().equals(id)) {
+			if (injection.getId().equals(id.trim())) {
 				System.out.println("WARNING: ID is not available");
 				return true;
 			}
@@ -57,25 +57,27 @@ public class InjectionManager implements FileConnection<Injection>, Printable<In
 	}
 
 	public Injection find(String id) throws NoSuchElementException {
+		String trimId = id.trim();
 		return injections.isEmpty() ? null
-				: injections.stream().filter(injection -> injection.getId().equals(id)).findFirst().get();
+				: injections.stream().filter(injection -> injection.getId().equals(trimId)).findFirst().get();
 	}
 
 	public Injection findByStudentId(String studentId) throws NoSuchElementException {
+		String trimId = studentId.trim();
 		return injections.isEmpty() ? null
-				: injections.stream().filter(injection -> injection.getStudentId().equals(studentId)).findFirst().get();
+				: injections.stream().filter(injection -> injection.getStudentId().equals(trimId)).findFirst().get();
 	}
 
 	public List<Injection> findAll(String studentId) {
+		String trimId = studentId.trim();
 		return injections.isEmpty() ? null
-				: injections.stream().filter(injection -> injection.getStudentId().equals(studentId))
-						.collect(Collectors.toList());
+				: injections.stream().filter(injection -> injection.getStudentId().equals(trimId)).collect(Collectors.toList());
 	}
 
 	public boolean isFutureDate(Date injectionDate) {
 		Date now = new Date();
 		if (injectionDate.compareTo(now) > 0) {
-			System.out.println("WARNING: You can't get the vaccine in the future");
+			System.out.println("WARNING: Vaccine date can't be in the future");
 			return true;
 		}
 		return false;
@@ -96,11 +98,18 @@ public class InjectionManager implements FileConnection<Injection>, Printable<In
 	}
 
 	public boolean isVaccinated(String studentId) {
-		return injections.stream().anyMatch(injection -> injection.getStudentId().equals(studentId));
+		String trimId = studentId.trim();
+		boolean isVaccinated = injections.stream().anyMatch(injection -> injection.getStudentId().equals(trimId));
+		if (isVaccinated) {
+			System.out.println("WARNING: This person has been vaccinated");
+		}
+		return isVaccinated;
 	}
 
 	public boolean isValidVaccine(String firstVaccineId, String secondVaccineId) {
-		return firstVaccineId.equals(secondVaccineId);
+		String trimFirst = firstVaccineId.trim();
+		String trimSecond = secondVaccineId.trim();
+		return trimFirst.equals(trimSecond);
 	}
 
 	public void add(Injection injection) {
@@ -131,7 +140,7 @@ public class InjectionManager implements FileConnection<Injection>, Printable<In
 		if (scanner != null) {
 			scanner.close();
 		}
-		
+
 		if (printWriter != null && bufferedWriter != null && fileWriter != null) {
 			printWriter.close();
 			bufferedWriter.close();
@@ -178,10 +187,10 @@ public class InjectionManager implements FileConnection<Injection>, Printable<In
 		String[] tokens = data.split("\\|");
 		Injection injection = null;
 
-
 		try {
-			injection = new Injection(tokens[0], tokens[1], tokens[2].equals("null") ? null : tokens[2], dateFormat.parse(tokens[3]),
-					tokens[4].equals("null") ? null : dateFormat.parse(tokens[4]), tokens[5], tokens[6]);
+			injection = new Injection(tokens[0], tokens[1], tokens[2].equals("null") ? null : tokens[2],
+					dateFormat.parse(tokens[3]), tokens[4].equals("null") ? null : dateFormat.parse(tokens[4]), tokens[5],
+					tokens[6]);
 		} catch (ParseException e) {
 			System.err.println("ERROR: Failed to parse object");
 		}
@@ -195,34 +204,34 @@ public class InjectionManager implements FileConnection<Injection>, Printable<In
 
 	public void print(List<Injection> injections) {
 		System.out.println(
-				"+---------------------------------------------Injection List--------------------------------------------------+");
-		System.out.format("|%8s|%15s|%15s|%15s|%15s|%15s|%20s|\n", "ID", "First Date", "First Place", "Second Date",
-				"Second Place", "Student ID", "Student Name");
+				"+-------------------------------------------Injection List-----------------------------------------------+");
+		System.out.format("|%8s|%15s|%15s|%15s|%15s|%15s|%15s|\n", "ID", "First Date", "First Place", "Second Date",
+				"Second Place", "Student ID", "Vaccine ID");
 		System.out.println(
-				"+-------------------------------------------------------------------------------------------------------------+");
+				"+--------------------------------------------------------------------------------------------------------+");
 		injections.stream().forEach(InjectionManager::printFormattedItem);
 		System.out.println(
-				"+-------------------------------------------------------------------------------------------------------------+");
+				"+--------------------------------------------------------------------------------------------------------+");
 	}
 
 	public void print(Injection injection) {
 		System.out.println(
-				"+---------------------------------------------Injection List--------------------------------------------------+");
-		System.out.format("|%8s|%15s|%15s|%15s|%15s|%15s|%20s|\n", "ID", "First Date", "First Place", "Second Date",
-				"Second Place", "Student ID", "Student Name");
+				"+------------------------------------------Injection List------------------------------------------------+");
+		System.out.format("|%8s|%15s|%15s|%15s|%15s|%15s|%15s|\n", "ID", "First Date", "First Place", "Second Date",
+				"Second Place", "Student ID", "Vaccine ID");
 		System.out.println(
-				"+-------------------------------------------------------------------------------------------------------------+");
+				"+--------------------------------------------------------------------------------------------------------+");
 		printFormattedItem(injection);
 		System.out.println(
-				"+-------------------------------------------------------------------------------------------------------------+");
+				"+--------------------------------------------------------------------------------------------------------+");
 	}
 
 	private static void printFormattedItem(Injection injection) {
-		System.out.format("|%8s|%15s|%15s|%15s|%15s|%15s|%20s|\n", injection.getId(),
+		System.out.format("|%8s|%15s|%15s|%15s|%15s|%15s|%15s|\n", injection.getId(),
 				Utility.toSimpleDateString(injection.getFirstInjectionDate()), injection.getFirstInjectionPlace(),
 				injection.getSecondInjectionDate() == null ? "N/A"
 						: Utility.toSimpleDateString(injection.getSecondInjectionDate()),
 				injection.getSecondInjectionPlace() == null ? "N/A" : injection.getSecondInjectionPlace(),
-				injection.getStudentId(), StudentManager.getInstance().find(injection.getStudentId()).getName());
+				injection.getStudentId(), injection.getVaccineId());
 	}
 }
