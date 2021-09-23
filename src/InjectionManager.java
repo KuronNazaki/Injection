@@ -68,6 +68,14 @@ public class InjectionManager implements FileConnection<Injection>, Printable<In
 				: injections.stream().filter(injection -> injection.getStudentId().equals(trimId)).findFirst().get();
 	}
 
+	public List<Injection> findAllByVaccineName(String vaccineName) {
+		String trimName = vaccineName.trim();
+		VaccineManager vaccines = VaccineManager.getInstance();
+		return injections.isEmpty() ? null
+				: injections.stream().filter(injection -> vaccines.find(injection.getVaccineId()).getName().equals(trimName))
+						.collect(Collectors.toList());
+	}
+
 	public List<Injection> findAll(String studentId) {
 		String trimId = studentId.trim();
 		return injections.isEmpty() ? null
@@ -81,6 +89,20 @@ public class InjectionManager implements FileConnection<Injection>, Printable<In
 			return true;
 		}
 		return false;
+	}
+
+	public boolean isBeforeCovidPandemic(Date injectionDate) {
+		Date covidStart = null;
+		try {
+			covidStart = new SimpleDateFormat("dd/MM/yyy").parse("23/1/2020");
+		} catch (ParseException e) {
+			System.out.println("ERROR: Parsing failed");
+		}
+		boolean isBeforeCovid = injectionDate.compareTo(covidStart) < 0;
+		if (isBeforeCovid) {
+			System.out.println("WARNING: Before COVID pandemic");
+		}
+		return isBeforeCovid;
 	}
 
 	public boolean isValidSecondDate(Date firstDate, Date secondDate) {

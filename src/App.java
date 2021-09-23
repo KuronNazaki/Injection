@@ -75,6 +75,9 @@ public class App {
 					this.search();
 					break;
 				case 6:
+					this.searchByName();
+					break;
+				case 7:
 					System.out.println("Bye. Thank you for using me UwU");
 					break;
 				default:
@@ -137,6 +140,11 @@ public class App {
 				firstShot = dateFormat.parse(inputString);
 				if (injections.isFutureDate(firstShot)) {
 					firstShot = null;
+					continue;
+				}
+				if (injections.isBeforeCovidPandemic(firstShot)) {
+					firstShot = null;
+					continue;
 				}
 			} catch (ParseException e) {
 				System.err.println("ERROR: Invalid date");
@@ -186,8 +194,9 @@ public class App {
 
 		}
 
-		Injection injection = new Injection(id.trim(), firstPlace.trim(), secondPlace.trim(), firstShot, secondShot,
-				studentId.trim(), vaccineId.trim());
+		Injection injection = new Injection(id.trim(), firstPlace.trim(),
+				secondPlace == null ? secondPlace : secondPlace.trim(), firstShot, secondShot, studentId.trim(),
+				vaccineId.trim());
 		injections.add(injection);
 		System.out.println("\nNew injection with ID = " + id + " has been added successfully");
 	}
@@ -310,6 +319,24 @@ public class App {
 			injections.print(searchList);
 		} catch (NoSuchElementException e) {
 			System.out.println("WARNING: Unavailable injection with such Student ID");
+			return;
+		}
+	}
+
+	private void searchByName() {
+		String vaccineName = null;
+
+		System.out.println("------SEARCH INJECTION BY VACCINE NAME------");
+		do {
+			System.out.print("Enter vaccine name: ");
+			vaccineName = userScanner.nextLine();
+		} while (Utility.isEmptyString(vaccineName));
+
+		try {
+			List<Injection> injection = injections.findAllByVaccineName(vaccineName.trim());
+			injections.print(injection);
+		} catch (NoSuchElementException e) {
+			System.out.println("WARNING: Unavailable injection with such vaccine name");
 			return;
 		}
 	}
